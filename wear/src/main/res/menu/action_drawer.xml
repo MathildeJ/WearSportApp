@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_send_notification"
+        android:icon="@drawable/ic_reply"
+        android:title="Send notification"/>
+    <item android:id="@+id/menu_send_message"
+        android:icon="@drawable/ic_sms"
+        android:title="Send message" />
+
+</menu>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wearable.view.drawer.WearableDrawerLayout
+    android:id="@+id/drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:deviceIds="wear">
+
+        <android.support.wearable.view.WearableRecyclerView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/menu_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            android:scrollbars="vertical">
+        </android.support.wearable.view.WearableRecyclerView>
+
+    <android.support.wearable.view.drawer.WearableActionDrawer
+            android:id="@+id/bottom_action_drawer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:action_menu="@menu/action_drawer"
+            android:background="@color/grey"/>
+
+</android.support.wearable.view.drawer.WearableDrawerLayout>

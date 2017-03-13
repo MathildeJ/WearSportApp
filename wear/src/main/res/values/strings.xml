@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">WearSportApp</string>
+    <string-array name="reply_choices">
+        <item>Yes</item>
+        <item>Of course</item>
+        <item>No</item>
+        <item>Maybe</item>
+    </string-array>
+
+    <string-array name="reply_message_choices">
+        <item>I think so.</item>
+        <item>Yes, absolutely.</item>
+    </string-array>
+
+    <string name="start_sports">Sports</string>
+    <string name="start_action">Start</string>
+
+</resources>
