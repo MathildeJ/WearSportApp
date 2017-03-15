@@ -39,6 +39,7 @@ public class MenuAdapter extends WearableRecyclerView.Adapter<MenuEntryViewHolde
                         break;
                     case 1:
                         //not doing anything for now
+                        context.startActivity(StepCounterActivity.createIntent(context));
                         break;
                 }
 
