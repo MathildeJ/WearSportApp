@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<android.support.wearable.view.BoxInsetLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,19 +15,17 @@
 
     <TextView
         android:id="@+id/text"
-        android:layout_width="171dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Data"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="0dp" />
+        android:text="Data" />
 
     <Button
         android:id="@+id/button"
-        android:layout_width="171dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Update counter"
-        app:layout_constraintTop_toBottomOf="@+id/text"
-        tools:layout_editor_absoluteX="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/text" />
 
 </android.support.constraint.ConstraintLayout>
+</android.support.wearable.view.BoxInsetLayout>

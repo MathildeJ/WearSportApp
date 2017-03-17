@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WearSportApp</string>
+    <string name="login_strava">Login Strava</string>
 </resources>

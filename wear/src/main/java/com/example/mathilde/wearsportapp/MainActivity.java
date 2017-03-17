@@ -30,6 +30,7 @@ public class MainActivity extends WearableActivity implements
     private WearableActionDrawer mWearableActionDrawer;
 
     private static final String OPEN_LINK_PATH = "/open_link";
+    private static final String STRAVA_LOGIN = "/strava_login";
     private GoogleApiClient apiClient;
     private Node node;
 
@@ -69,7 +70,7 @@ public class MainActivity extends WearableActivity implements
                 startActivity(SendNotificationActivity.createIntent(getApplicationContext(), "Send notifications"));
                 break;
             case R.id.menu_send_message:
-                sendMessage("http://www.sweetzpot.com");
+                sendStravaLoginMessage("");
                 break;
         }
         mWearableDrawerLayout.closeDrawer(mWearableActionDrawer);
@@ -92,6 +93,28 @@ public class MainActivity extends WearableActivity implements
                 }
             }
         });
+    }
+
+    private void sendStravaLoginMessage(String message){
+        if(node!=null & apiClient!=null && apiClient.isConnected()){
+            Wearable.MessageApi.sendMessage(
+                    apiClient, node.getId(), STRAVA_LOGIN, message.getBytes()).setResultCallback(
+                    new ResultCallback<MessageApi.SendMessageResult>() {
+                        @Override
+                        public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
+                            if(sendMessageResult.getStatus().isSuccess()){
+                                showConfirmation();
+                            } else {
+                                showError("Could not send Strava login request");
+                            }
+                        }
+                    }
+            );
+        } else if(node==null) {
+            showError("Could not find node");
+        } else {
+            showError("Could not connect to API");
+        }
     }
 
     private void sendMessage(String message){

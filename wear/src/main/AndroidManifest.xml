@@ -5,6 +5,7 @@
     <uses-feature android:name="android.hardware.type.watch" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -36,12 +37,22 @@
         <activity android:name=".SportBrowserActivity" />
         <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
 
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+        <activity android:name=".StepCounterActivity" />
 
-        <activity android:name=".SendMessageActivity" />
-        <activity android:name=".StepCounterActivity"></activity>
+        <service
+            android:name=".StravaActionsService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+
+                <data
+                    android:host="*"
+                    android:pathPrefix="/strava_actions"
+                    android:scheme="wear"/>
+            </intent-filter>
+        </service>
+
+        <activity android:name=".StravaAPIsActivity"/>
+
     </application>
 
 </manifest>

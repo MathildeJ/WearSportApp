@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_send_notification"
         android:icon="@drawable/ic_reply"
-        android:title="Send notification"/>
+        android:title="Send notifications"/>
     <item android:id="@+id/menu_send_message"
-        android:icon="@drawable/ic_sms"
-        android:title="Send message" />
+        android:icon="@drawable/ic_right"
+        android:title="Strava login" />
 
 </menu>
