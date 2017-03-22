@@ -36,23 +36,22 @@
         <activity android:name=".SendNotificationActivity" />
         <activity android:name=".SportBrowserActivity" />
         <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
-
         <activity android:name=".StepCounterActivity" />
 
-        <service
-            android:name=".StravaActionsService">
+        <service android:name=".StravaActionsService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
 
                 <data
                     android:host="*"
                     android:pathPrefix="/strava_actions"
-                    android:scheme="wear"/>
+                    android:scheme="wear" />
             </intent-filter>
         </service>
 
-        <activity android:name=".StravaAPIsActivity"/>
-
+        <activity android:name=".StravaAPIsActivity" />
+        <activity android:name=".StepChallengeActivity" />
+        <activity android:name=".ResultChallengeActivity"></activity>
     </application>
 
 </manifest>

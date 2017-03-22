@@ -15,20 +15,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class SendNotificationActivity extends WearableActivity {
-    private static final String EXTRA_TITLE = "ViewEventActivity.EXTRA_TITLE";
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_send_notification);
-        ButterKnife.bind(this);
-    }
-
-    public static Intent createIntent(Context context, String title){
-        Intent intent = new Intent(context, SendNotificationActivity.class);
-        intent.putExtra(EXTRA_TITLE, title);
-        return intent;
-    }
+    private static final String EXTRA_TITLE = "com.example.mathilde.wearsportapp.SendNotificationActivity.EXTRA_TITLE";
 
     @OnClick(R.id.notification_button)
     public void onSendNotificationClicked(){
@@ -53,13 +40,24 @@ public class SendNotificationActivity extends WearableActivity {
     @OnClick(R.id.notification_message_button)
     public void onSendMessageNotificationClicked(){    sendMessageNotification();}
 
-
     @OnClick(R.id.notification_big_button)
     public void onSendNotificationBigClicked(){
         sendBigNotification();
     }
 
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_send_notification);
+        ButterKnife.bind(this);
+    }
+
+    public static Intent createIntent(Context context, String title){
+        Intent intent = new Intent(context, SendNotificationActivity.class);
+        intent.putExtra(EXTRA_TITLE, title);
+        return intent;
+    }
 
     private void sendNotification(){
         int notificationId = 001;

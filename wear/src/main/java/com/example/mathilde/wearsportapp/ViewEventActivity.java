@@ -12,8 +12,8 @@ import butterknife.ButterKnife;
 
 public class ViewEventActivity extends WearableActivity {
 
-    private static final String EXTRA_TITLE = "ViewEventActivity.EXTRA_TITLE";
-    private static final String EXTRA_TEXT = "ViewEventActivity.EXTRA_TEXT";
+    private static final String EXTRA_TITLE = "com.example.mathilde.wearsportapp.ViewEventActivity.EXTRA_TITLE";
+    private static final String EXTRA_TEXT = "com.example.mathilde.wearsportapp.ViewEventActivity.EXTRA_TEXT";
 
     @Bind(R.id.name_text) TextView nameText;
     @Bind(R.id.message_text) TextView messageText;

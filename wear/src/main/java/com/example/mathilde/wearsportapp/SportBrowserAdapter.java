@@ -18,12 +18,12 @@ import butterknife.ButterKnife;
 public class SportBrowserAdapter extends WearableRecyclerView.Adapter<SportBrowserAdapter.SportViewHolder> {
 
     List<Sport> sports;
-    private Context context;
+    //private Context context;
     private SportInterface sportInterface;
 
-    SportBrowserAdapter(List<Sport> sports, Context context, SportInterface si){
+    SportBrowserAdapter(List<Sport> sports, /*Context context,*/ SportInterface si){
         this.sports = sports;
-        this.context = context;
+        //this.context = context;
         this.sportInterface = si;
     }
 

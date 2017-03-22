@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -63,6 +64,7 @@ public class StravaAPIsActivity extends WearableActivity implements
         ButterKnife.bind(this);
 
         initializeClient();
+        mTextView.setMovementMethod(new ScrollingMovementMethod());
     }
 
     public void initializeClient(){
@@ -74,9 +76,21 @@ public class StravaAPIsActivity extends WearableActivity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        apiClient.connect();
+    protected void onResume() {
+        super.onResume();
+        Wearable.DataApi.addListener(apiClient, this);
+        if(apiClient==null ||!apiClient.isConnected()){
+          apiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Wearable.DataApi.removeListener(apiClient, this);
+        if(apiClient.isConnected()){
+          apiClient.disconnect();
+        }
     }
 
     @Override
@@ -89,12 +103,7 @@ public class StravaAPIsActivity extends WearableActivity implements
 
     }
 
-    @Override
-    protected void onStop() {
-        Wearable.DataApi.removeListener(apiClient, this);
-        apiClient.disconnect();
-        super.onStop();
-    }
+
 
     private void syncDataMap(String string){
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/action");

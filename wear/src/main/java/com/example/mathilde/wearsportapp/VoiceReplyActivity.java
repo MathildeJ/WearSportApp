@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.wearable.activity.WearableActivity;
 
 public class VoiceReplyActivity extends WearableActivity {
-    public static final String EXTRA_VOICE_REPLY = "VoiceReplyActivity.EXTRA_VOICE_REPLY";
+    public static final String EXTRA_VOICE_REPLY = "com.example.mathilde.wearsportapp.VoiceReplyActivity.EXTRA_VOICE_REPLY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

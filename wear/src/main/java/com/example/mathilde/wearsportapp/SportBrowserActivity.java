@@ -5,13 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.wearable.activity.ConfirmationActivity;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.DefaultOffsettingHelper;
 import android.support.wearable.view.WearableRecyclerView;
-import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -50,10 +48,9 @@ public class SportBrowserActivity extends WearableActivity implements
         rv.setOffsettingHelper(new DefaultOffsettingHelper());
 
         initializeData();
+        initializeClient();
 
-        connectApiClient();
-
-        SportBrowserAdapter adapter = new SportBrowserAdapter(sports, getApplicationContext(), this);
+        SportBrowserAdapter adapter = new SportBrowserAdapter(sports, /*getApplicationContext(),*/ this);
         rv.setAdapter(adapter);
 
     }
@@ -65,14 +62,23 @@ public class SportBrowserActivity extends WearableActivity implements
         sports.add(new Sport("Running", "description", R.drawable.ic_run, "https://en.wikipedia.org/wiki/Running"));
         sports.add(new Sport("CrossFit", "description", R.drawable.ic_cross, "https://en.wikipedia.org/wiki/CrossFit"));
     }
-
+/*
     @Override
     protected void onStart() {
         super.onStart();
         apiClient.connect();
     }
+*/
 
-    private void connectApiClient(){
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(apiClient == null || !apiClient.isConnected()){
+          apiClient.connect();
+        }
+    }
+
+    private void initializeClient(){
         apiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
@@ -108,7 +114,9 @@ public class SportBrowserActivity extends WearableActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        apiClient.disconnect();
+        if(apiClient.isConnected()){
+          apiClient.disconnect();
+        }
     }
 
     public void sendMessage(String message){

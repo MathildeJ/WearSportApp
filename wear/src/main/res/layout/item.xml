@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:descendantFocusability="blocksDescendants"
-        card_view:cardBackgroundColor="@color/grey"
+        card_view:cardBackgroundColor="@color/dark_grey"
         android:id="@+id/cv"
         android:layout_marginBottom="10dp"
         card_view:cardElevation="10dp"
@@ -41,7 +41,7 @@
                 android:layout_alignParentTop="true"
                 android:textSize="24sp"
                 android:clickable="true"
-                android:textColor="@android:color/holo_blue_dark"
+                android:textColor="@color/dark_blue"
                 />
 
             <TextView

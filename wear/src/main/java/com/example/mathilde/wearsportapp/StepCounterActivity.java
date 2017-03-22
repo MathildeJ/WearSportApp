@@ -84,7 +84,6 @@ public class StepCounterActivity extends WearableActivity {
                 )
                 .build();
 
-        mClient.connect();
     }
 
     public void subscribe() {
@@ -131,6 +130,22 @@ public class StepCounterActivity extends WearableActivity {
 
     private void readData() {
         new VerifyDataTask().execute();
+    }
+
+    @Override
+    protected void onResume(){
+         super.onResume();
+         if(mClient == null || !mClient.isConnected()){
+             mClient.connect();
+         }
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        if(mClient.isConnected()){
+          mClient.disconnect();
+        }
     }
 
 }

@@ -18,18 +18,18 @@
         android:id="@+id/retrieve_athlete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Retrieve athlete"/>
+        android:text="@string/strava_retrieve_athlete"/>
 
     <Button
         android:id="@+id/list_activities"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="List activities"/>
+        android:text="@string/strava_list_activities"/>
 
     <Button
         android:id="@+id/stats_athlete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Get athlete's stats"/>
+        android:text="@string/strava_stats_athlete"/>
 
 </LinearLayout>

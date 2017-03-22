@@ -171,6 +171,7 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
 
     private void startAPIMenuWatch(){
         sendMessage("");
+        mTextView.setText("Logged in");
     }
 
     private void sendMessage(String message){
@@ -215,15 +216,36 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        apiClient.connect();
+        if(apiClient == null || !apiClient.isConnected()){
+          apiClient.connect();
+        }
     }
+
+    /*@Override
+    protected void onResume() {
+        super.onResume();
+        Wearable.DataApi.addListener(apiClient, this);
+        if(apiClient == null ||!apiClient.isConnected()){
+            apiClient.connect();
+        }
+    }*/
 
     @Override
     protected void onStop() {
+        super.onStop();
         Wearable.DataApi.removeListener(apiClient, this);
         apiClient.disconnect();
-        super.onStop();
     }
+
+/*
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Wearable.DataApi.removeListener(apiClient, this);
+        if(apiClient.isConnected()){
+          apiClient.disconnect();
+        }
+    }*/
 
 
     private void resolveNode() {

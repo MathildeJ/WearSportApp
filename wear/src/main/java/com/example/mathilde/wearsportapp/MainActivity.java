@@ -29,7 +29,6 @@ public class MainActivity extends WearableActivity implements
     private WearableDrawerLayout mWearableDrawerLayout;
     private WearableActionDrawer mWearableActionDrawer;
 
-    private static final String OPEN_LINK_PATH = "/open_link";
     private static final String STRAVA_LOGIN = "/strava_login";
     private GoogleApiClient apiClient;
     private Node node;
@@ -117,28 +116,6 @@ public class MainActivity extends WearableActivity implements
         }
     }
 
-    private void sendMessage(String message){
-        if(node!=null & apiClient!=null && apiClient.isConnected()){
-            Wearable.MessageApi.sendMessage(
-                    apiClient, node.getId(), OPEN_LINK_PATH, message.getBytes()).setResultCallback(
-                    new ResultCallback<MessageApi.SendMessageResult>() {
-                        @Override
-                        public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
-                            if(sendMessageResult.getStatus().isSuccess()){
-                                showConfirmation();
-                            } else {
-                                showError("Could not send message");
-                            }
-                        }
-                    }
-            );
-        } else if(node==null) {
-            showError("Could not find node");
-        } else {
-            showError("Could not connect to API");
-        }
-    }
-
     private void showConfirmation(){
         Intent intent = new Intent(this, ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
@@ -157,19 +134,35 @@ public class MainActivity extends WearableActivity implements
         startActivity(intent);
     }
 
-
+/*
     @Override
     protected void onStart() {
         super.onStart();
         apiClient.connect();
     }
-
+*/
     @Override
     protected void onPause() {
         super.onPause();
-        apiClient.disconnect();
+        if(apiClient.isConnected()){
+          apiClient.disconnect();
+        }
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(apiClient == null || !apiClient.isConnected()){
+            apiClient.connect();
+        }
+    }
+/*
+    @Override
+    protected void onStop(){
+        apiClient.disconnect();
+        super.onStop();
+    }
+*/
     @Override
     public void onConnectionSuspended(int i) {
 

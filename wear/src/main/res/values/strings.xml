@@ -14,5 +14,15 @@
 
     <string name="start_sports">Sports</string>
     <string name="start_action">Get daily steps</string>
+    <string name="start_challenge">Start challenge"</string>
+    <string name="result_message">Waiting for results...</string>
+    <string name="back">Go back</string>
+    <string name="challenge_instruction">Walk as fast as you can for 3 minutes</string>
+    <string name="ready">Ready!</string>
+    <string name="update_counter">Update counter</string>
+    <string name="no_data">No data</string>
+    <string name="strava_retrieve_athlete">Retrieve athlete</string>
+    <string name="strava_list_activities">List activities</string>
+    <string name="strava_stats_athlete">See athlete\'s stats</string>
 
 </resources>

@@ -9,8 +9,8 @@ import android.widget.Toast;
 
 public class MenuAdapter extends WearableRecyclerView.Adapter<MenuEntryViewHolder> {
 
-    private final int[] ENTRIES = new int[]{R.string.start_sports, R.string.start_action};
-    private final int[] ICONS = new int[]{R.drawable.ic_exercises, R.drawable.ic_steps};
+    private final int[] ENTRIES = new int[]{R.string.start_sports, R.string.start_action, R.string.start_challenge};
+    private final int[] ICONS = new int[]{R.drawable.ic_exercises, R.drawable.ic_steps, R.drawable.ic_play};
 
     private Context context;
 
@@ -39,6 +39,9 @@ public class MenuAdapter extends WearableRecyclerView.Adapter<MenuEntryViewHolde
                         break;
                     case 1:
                         context.startActivity(StepCounterActivity.createIntent(context));
+                        break;
+                    case 2:
+                        context.startActivity(StepChallengeActivity.createIntent(context));
                         break;
                 }
 
