@@ -90,7 +90,7 @@ public class StepChallengeActivity extends WearableActivity implements
     }
 
     private void configureDelayedStart() {
-        delayedConfirmationView.setTotalTimeMs(10000);
+        delayedConfirmationView.setTotalTimeMs(THREE_MINUTES);
         delayedConfirmationView.setListener(this);
         delayedConfirmationView.setVisibility(View.VISIBLE);
         delayedConfirmationView.start();
