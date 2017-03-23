@@ -1,6 +1,8 @@
 package com.example.mathilde.wearsportapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,16 +12,24 @@ import android.support.wearable.view.DefaultOffsettingHelper;
 import android.support.wearable.view.WearableRecyclerView;
 import android.support.wearable.view.drawer.WearableActionDrawer;
 import android.support.wearable.view.drawer.WearableDrawerLayout;
+import android.support.wearable.view.drawer.WearableNavigationDrawer;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.fitness.ConfigApi;
+import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
+
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends WearableActivity implements
         WearableActionDrawer.OnMenuItemClickListener,
@@ -49,12 +59,22 @@ public class MainActivity extends WearableActivity implements
         mWearableActionDrawer = (WearableActionDrawer) findViewById(R.id.bottom_action_drawer);
         mWearableActionDrawer.setOnMenuItemClickListener(this);
 
+        ViewTreeObserver observer = mWearableDrawerLayout.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mWearableDrawerLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                mWearableDrawerLayout.peekDrawer(Gravity.BOTTOM);
+            }
+        });
+
         initializeClient();
     }
 
     public void initializeClient(){
         apiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
+                .addApi(Fitness.CONFIG_API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
@@ -134,13 +154,6 @@ public class MainActivity extends WearableActivity implements
         startActivity(intent);
     }
 
-/*
-    @Override
-    protected void onStart() {
-        super.onStart();
-        apiClient.connect();
-    }
-*/
     @Override
     protected void onPause() {
         super.onPause();
@@ -156,13 +169,7 @@ public class MainActivity extends WearableActivity implements
             apiClient.connect();
         }
     }
-/*
-    @Override
-    protected void onStop(){
-        apiClient.disconnect();
-        super.onStop();
-    }
-*/
+
     @Override
     public void onConnectionSuspended(int i) {
 
@@ -172,4 +179,5 @@ public class MainActivity extends WearableActivity implements
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
 }

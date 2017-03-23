@@ -6,5 +6,4 @@
     <item android:id="@+id/menu_send_message"
         android:icon="@drawable/ic_right"
         android:title="Strava login" />
-
 </menu>

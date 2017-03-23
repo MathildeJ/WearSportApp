@@ -94,11 +94,14 @@ public class StartSessionActivity extends AppCompatActivity implements
     private static final String TIMER_FINISHED_PATH = "/timer_finished";
     private static final String TIMER_STOPPED_PATH = "/timer_stopped";
     private static final String CHALLENGE_DONE_PATH = "/challenge_done";
-    private Boolean permissionFineLocation;
+    private static final String SESSION_READ_PATH = "/session_read";
+    private static final String SESSION_STARTED_PATH = "/session_started";
+    private boolean permissionFineLocation = false;
 
     private static final int REQUEST_OAUTH = 1;
     private static final String AUTH_PENDING = "auth_state_pending";
     private boolean authInProgress = false;
+    private static final int REQUEST_FINE_LOCATION = 100;
 
     private static final DataType[] valuesDataType = new DataType[]{DataType.TYPE_STEP_COUNT_DELTA, DataType.TYPE_STEP_COUNT_CADENCE, DataType.TYPE_CALORIES_EXPENDED, DataType.TYPE_DISTANCE_DELTA};
 
@@ -186,7 +189,7 @@ public class StartSessionActivity extends AppCompatActivity implements
         if(permissionFineLocation){
             subscribeToType(DataType.TYPE_SPEED);
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_OAUTH);
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_FINE_LOCATION);
         }
     }
 
@@ -212,7 +215,7 @@ public class StartSessionActivity extends AppCompatActivity implements
     @Override
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_OAUTH) {
+        if (requestCode == REQUEST_FINE_LOCATION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted
                 permissionFineLocation = true;
@@ -249,7 +252,7 @@ public class StartSessionActivity extends AppCompatActivity implements
         @Override
         protected void onPostExecute(Void result){
             Log.i(TAG, "startandverify returned");
-            syncDataMap("/session_started", RESPONSE, "started_session_" + mSession.getIdentifier());
+            syncDataMap(SESSION_STARTED_PATH, RESPONSE, "started_session_" + mSession.getIdentifier());
             mTextView.setText("Challenge started!");
         }
     }
@@ -336,7 +339,7 @@ public class StartSessionActivity extends AppCompatActivity implements
 
         @Override
         protected void onPostExecute(String result){
-          syncDataMap("/session_read", SESSION_INFO, result);
+          syncDataMap(SESSION_READ_PATH, SESSION_INFO, result);
           mTextView.setText("Reading results...");
         }
     }
@@ -532,6 +535,20 @@ public class StartSessionActivity extends AppCompatActivity implements
         }
     }
 
+    private void unsubscribeFitnessData(){
+        for(DataType dataType : valuesDataType){
+            unsubscribeToType(dataType);
+        }
+        permissionFineLocation = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        if(permissionFineLocation){
+            unsubscribeToType(DataType.TYPE_SPEED);
+        }
+    }
+
+    private void unsubscribeToType(final DataType dataType){
+        Fitness.RecordingApi.unsubscribe(mClient, dataType);
+    }
+
     @Override
     protected void onResume(){
         super.onResume();
@@ -555,6 +572,7 @@ public class StartSessionActivity extends AppCompatActivity implements
 
     protected void onStop() {
         super.onStop();
+        unsubscribeFitnessData();
         if(mClient.isConnected()){
             mClient.disconnect();
         }

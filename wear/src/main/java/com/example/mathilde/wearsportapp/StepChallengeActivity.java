@@ -44,6 +44,7 @@ public class StepChallengeActivity extends WearableActivity implements
     private Node node;
     private GoogleApiClient apiClient;
     private static final String START_SESSION_PATH = "/start_session";
+    private static final String SESSION_STARTED_PATH = "/session_started";
     private static final String TIMER_FINISHED_PATH = "/timer_finished";
     private static final String TIMER_STOPPED_PATH = "/timer_stopped";
     private static final String RESPONSE = "com.example.mathilde.wearsportapp.response";
@@ -114,13 +115,6 @@ public class StepChallengeActivity extends WearableActivity implements
         }
     };
 
-    /*
-    @Override
-    protected void onStart() {
-        super.onStart();
-        apiClient.connect();
-        Wearable.DataApi.addListener(apiClient, this);
-    }*/
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -129,7 +123,7 @@ public class StepChallengeActivity extends WearableActivity implements
 
     @Override
     public void onConnectionSuspended(int i) {
-        mTextView.setText("connection suspended");
+
     }
 
     @Override
@@ -167,13 +161,6 @@ public class StepChallengeActivity extends WearableActivity implements
         }
         Wearable.DataApi.addListener(apiClient, this);
     }
-/*
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Wearable.DataApi.removeListener(apiClient, this);
-        apiClient.disconnect();
-    }*/
 
     public void sendMessage(String path, String message){
         Log.i(TAG, "Send message " + message + "with path " + path);
@@ -204,7 +191,7 @@ public class StepChallengeActivity extends WearableActivity implements
         for(DataEvent event : events) {
             final Uri uri = event.getDataItem().getUri();
             final String path = uri!=null ? uri.getPath() : null;
-            if("/session_started".equals(path)) {
+            if(SESSION_STARTED_PATH.equals(path)) {
                 final DataMap map = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                 String string = map.getString(RESPONSE);
                 Log.i(TAG, "Data changed: " + string);
@@ -228,7 +215,7 @@ public class StepChallengeActivity extends WearableActivity implements
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
                 ConfirmationActivity.FAILURE_ANIMATION);
         intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
-                "Session cancelled");
+                "Session canceled");
         startActivity(intent);
         finish();
         sendMessage(TIMER_STOPPED_PATH, "step_challenge_stopped");

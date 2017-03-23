@@ -76,9 +76,6 @@
         <activity android:name=".StartSessionActivity">
 
         </activity>
-        <activity android:name=".StartChallengeActivity" />
-        <activity android:name=".TestSessionActivity">
-        </activity>
     </application>
 
 </manifest>

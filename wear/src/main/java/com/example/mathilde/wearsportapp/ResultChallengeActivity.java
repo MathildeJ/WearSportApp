@@ -43,16 +43,10 @@ public class ResultChallengeActivity extends WearableActivity implements
     private GoogleApiClient apiClient;
     private Node node;
     private static final String CHALLENGE_DONE_PATH = "/challenge_done";
+    private static final String SESSION_READ_PATH = "/session_read";
 
     @Bind(R.id.text)
     TextView mTextView;
-
-    @OnClick(R.id.button)
-    public void onButtonClicked(){
-        finish();
-        sendMessage("done");
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +77,7 @@ public class ResultChallengeActivity extends WearableActivity implements
         for(DataEvent event : events) {
             final Uri uri = event.getDataItem().getUri();
             final String path = uri!=null ? uri.getPath() : null;
-            if("/session_read".equals(path)){
+            if(SESSION_READ_PATH.equals(path)){
                 final DataMap map = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                 String string = map.getString(SESSION_INFO);
                 mTextView.setText(string);
@@ -126,9 +120,6 @@ public class ResultChallengeActivity extends WearableActivity implements
     protected void onPause(){
         super.onPause();
         Wearable.DataApi.removeListener(apiClient, this);
-        if(apiClient.isConnected()){
-            apiClient.disconnect();
-        }
     }
 
     @Override
@@ -138,6 +129,15 @@ public class ResultChallengeActivity extends WearableActivity implements
           apiClient.connect();
         }
         Wearable.DataApi.addListener(apiClient, this);
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        sendMessage("done");
+        if(apiClient.isConnected()){
+            apiClient.disconnect();
+        }
     }
 
     @Override
