@@ -1,54 +1,42 @@
 package com.example.mathilde.wearsportapp;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.wearable.activity.ConfirmationActivity;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.DelayedConfirmationView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.data.FreezableUtils;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.Wearable;
 
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class StepChallengeActivity extends WearableActivity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
         DataApi.DataListener,
         DelayedConfirmationView.DelayedConfirmationListener{
 
-    private Node node;
-    private GoogleApiClient apiClient;
     private static final String START_SESSION_PATH = "/start_session";
     private static final String SESSION_STARTED_PATH = "/session_started";
     private static final String TIMER_FINISHED_PATH = "/timer_finished";
     private static final String TIMER_STOPPED_PATH = "/timer_stopped";
     private static final String RESPONSE = "com.example.mathilde.wearsportapp.response";
     private static final String TAG = "StepChallengeActivity";
+    private static final String fragmentName = "apiClient";
 
     private static final long THREE_MINUTES = 180000;
 
@@ -58,8 +46,8 @@ public class StepChallengeActivity extends WearableActivity implements
     @Bind(R.id.text)
     TextView mTextView;
 
-    @OnClick(R.id.button)
-    public void onButtonClicked(){sendMessage(START_SESSION_PATH,"");}
+    @Bind(R.id.button)
+    Button mButton;
 
     private static final long ONE_MINUTE = 60000;
     private int timeRemaining;
@@ -71,7 +59,7 @@ public class StepChallengeActivity extends WearableActivity implements
         setContentView(R.layout.activity_step_challenge);
         ButterKnife.bind(this);
 
-        initializeClient();
+        initializeFragment();
 
         handler = new Handler();
         handler.postDelayed(showTimeRemaining, ONE_MINUTE);
@@ -82,12 +70,20 @@ public class StepChallengeActivity extends WearableActivity implements
         return intent;
     }
 
-    public void initializeClient(){
-        apiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+    private void initializeFragment(){
+        FragmentManager fragmentManager = getFragmentManager();
+        android.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        GoogleApiClientWithNodeFragment fragment = GoogleApiClientWithNodeFragment.newInstance(false, true, true, "");
+        fragmentTransaction.add(fragment, fragmentName);
+        fragmentTransaction.commit();
+
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GoogleApiClientWithNodeFragment fragment = (GoogleApiClientWithNodeFragment)getFragmentManager().findFragmentByTag(fragmentName);
+                fragment.sendMessage(START_SESSION_PATH,"");
+            }
+        });
     }
 
     private void configureDelayedStart() {
@@ -115,76 +111,6 @@ public class StepChallengeActivity extends WearableActivity implements
         }
     };
 
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        resolveNode();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.i(TAG, "Connection failed");
-    }
-
-    private void resolveNode() {
-        Wearable.NodeApi.getConnectedNodes(apiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-            @Override
-            public void onResult(@NonNull NodeApi.GetConnectedNodesResult nodesResult) {
-                for (Node node : nodesResult.getNodes()) {
-                    if (node.isNearby()) {
-                        StepChallengeActivity.this.node = node;
-                    }
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onPause(){
-        super.onPause();
-        Wearable.DataApi.removeListener(apiClient, this);
-        if(apiClient.isConnected()){
-            apiClient.disconnect();
-        }
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        if(apiClient == null || !apiClient.isConnected()){
-          apiClient.connect();
-        }
-        Wearable.DataApi.addListener(apiClient, this);
-    }
-
-    public void sendMessage(String path, String message){
-        Log.i(TAG, "Send message " + message + "with path " + path);
-        if(node!=null & apiClient!=null && apiClient.isConnected()){
-            Wearable.MessageApi.sendMessage(
-                    apiClient, node.getId(), path, message.getBytes()).setResultCallback(
-                    new ResultCallback<MessageApi.SendMessageResult>() {
-                        @Override
-                        public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
-                            if(sendMessageResult.getStatus().isSuccess()){
-                                Log.i(TAG, "Send message success");
-                            } else {
-                                Log.i(TAG, "Failed to send message");
-                            }
-                        }
-                    }
-            );
-        } else if(node==null) {
-            Log.i(TAG, "Could not find node");
-        } else {
-
-        }
-    }
-
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
         final List<DataEvent> events = FreezableUtils.freezeIterable(dataEventBuffer);
@@ -203,22 +129,28 @@ public class StepChallengeActivity extends WearableActivity implements
 
     @Override
     public void onTimerFinished(View view) {
-        finish();
-        sendMessage(TIMER_FINISHED_PATH, "step_challenge_finished");
+        GoogleApiClientWithNodeFragment fragment = (GoogleApiClientWithNodeFragment)getFragmentManager().findFragmentByTag(fragmentName);
+        fragment.sendMessage(TIMER_FINISHED_PATH, "step_challenge_finished");
         startResultChallenge();
+        finish();
     }
 
     @Override
     public void onTimerSelected(View view) {
         delayedConfirmationView.setListener(null);
+        startActivity(createConfirmationCanceledIntent());
+        GoogleApiClientWithNodeFragment fragment = (GoogleApiClientWithNodeFragment)getFragmentManager().findFragmentByTag(fragmentName);
+        fragment.sendMessage(TIMER_STOPPED_PATH, "step_challenge_stopped");
+        finish();
+    }
+
+    private Intent createConfirmationCanceledIntent(){
         Intent intent = new Intent(this, ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
                 ConfirmationActivity.FAILURE_ANIMATION);
         intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
-                "Session canceled");
-        startActivity(intent);
-        finish();
-        sendMessage(TIMER_STOPPED_PATH, "step_challenge_stopped");
+                "Challenge canceled");
+        return intent;
     }
 
     private void startResultChallenge() {

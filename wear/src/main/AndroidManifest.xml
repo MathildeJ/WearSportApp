@@ -36,7 +36,8 @@
         <activity android:name=".SendNotificationActivity" />
         <activity android:name=".SportBrowserActivity" />
         <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
-        <activity android:name=".StepCounterActivity" />
+        <activity
+            android:name=".StepCounterActivity" />
 
         <service android:name=".StravaActionsService">
             <intent-filter>

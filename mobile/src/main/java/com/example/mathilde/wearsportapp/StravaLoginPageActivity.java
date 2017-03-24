@@ -1,26 +1,25 @@
 package com.example.mathilde.wearsportapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.data.FreezableUtils;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi;
@@ -45,12 +44,39 @@ import com.sweetzpot.stravazpot.authenticaton.ui.StravaLoginActivity;
 import com.sweetzpot.stravazpot.authenticaton.ui.StravaLoginButton;
 import com.sweetzpot.stravazpot.common.api.AuthenticationConfig;
 import com.sweetzpot.stravazpot.common.api.StravaConfig;
+import com.sweetzpot.stravazpot.common.api.exception.StravaAPIException;
 import com.sweetzpot.stravazpot.upload.api.UploadAPI;
+import com.sweetzpot.stravazpot.upload.model.DataType;
+import com.sweetzpot.stravazpot.upload.model.UploadActivityType;
+import com.sweetzpot.stravazpot.upload.model.UploadStatus;
+import com.sweetzpot.tcxzpot.TCXDate;
+import com.sweetzpot.tcxzpot.serializers.FileSerializer;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+
+import static com.sweetzpot.tcxzpot.Activities.activities;
+import static com.sweetzpot.tcxzpot.Intensity.ACTIVE;
+import static com.sweetzpot.tcxzpot.Notes.notes;
+import static com.sweetzpot.tcxzpot.Position.position;
+import static com.sweetzpot.tcxzpot.Sport.RUNNING;
+import static com.sweetzpot.tcxzpot.TCXDate.tcxDate;
+import static com.sweetzpot.tcxzpot.Track.trackWith;
+import static com.sweetzpot.tcxzpot.TriggerMethod.MANUAL;
+import static com.sweetzpot.tcxzpot.builders.ActivityBuilder.activity;
+import static com.sweetzpot.tcxzpot.builders.ApplicationBuilder.application;
+import static com.sweetzpot.tcxzpot.builders.BuildBuilder.aBuild;
+import static com.sweetzpot.tcxzpot.builders.DeviceBuilder.device;
+import static com.sweetzpot.tcxzpot.builders.LapBuilder.aLap;
+import static com.sweetzpot.tcxzpot.builders.TrackpointBuilder.aTrackpoint;
+import static com.sweetzpot.tcxzpot.builders.TrainingCenterDatabaseBuilder.trainingCenterDatabase;
+import static com.sweetzpot.tcxzpot.builders.VersionBuilder.version;
+import static java.util.Calendar.FEBRUARY;
 
 public class StravaLoginPageActivity extends AppCompatActivity implements
         DataApi.DataListener,
@@ -63,6 +89,9 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
     private static final String TEXT = "com.example.wearsportapp.text";
     private static final String RESPONSE = "com.example.wearsportapp.response";
     private static final String SECRET = "b8d16c0afe8752c49d68cf30b5b52fa3fc7c98ef";
+
+    private static final String STRAVA_DIRECTORY = "StravaZpot";
+    private static final String TAG = "StravaLoginPageActivity";
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -164,6 +193,7 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == RQ_LOGIN && resultCode == RESULT_OK && data != null) {
+            loginButton.setVisibility(View.INVISIBLE);
             String code = data.getStringExtra(StravaLoginActivity.RESULT_CODE);
             obtainToken(code);
         }
@@ -171,7 +201,7 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
 
     private void startAPIMenuWatch(){
         sendMessage("");
-        mTextView.setText("Logged in");
+        mTextView.setText("You are now logged in with Strava");
     }
 
     private void sendMessage(String message){
@@ -221,31 +251,14 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
         }
     }
 
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        Wearable.DataApi.addListener(apiClient, this);
-        if(apiClient == null ||!apiClient.isConnected()){
-            apiClient.connect();
-        }
-    }*/
-
     @Override
     protected void onStop() {
         super.onStop();
         Wearable.DataApi.removeListener(apiClient, this);
-        apiClient.disconnect();
-    }
-
-/*
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Wearable.DataApi.removeListener(apiClient, this);
         if(apiClient.isConnected()){
           apiClient.disconnect();
         }
-    }*/
+    }
 
 
     private void resolveNode() {
@@ -280,6 +293,9 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
                     case "LA":
                         listActivities();
                         break;
+                    case "UF":
+                        uploadFile();
+                        break;
                 }
             }
         }
@@ -305,7 +321,7 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
 
         @Override
         protected void onPostExecute(Token result){
-            loginButton.setVisibility(View.INVISIBLE);
+            //loginButton.setVisibility(View.INVISIBLE);
 
             StravaConfig config = StravaConfig.withToken(result)
                     .debug()
@@ -354,7 +370,7 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
                 } else {
                     String res = "";
                     for(Activity activity : activities){
-                        res+="Activity: " + activity.getDescription() + "\n";
+                        res+="Activity: " + activity.getExternalID() + "\t" + activity.getName() + "\n";
                     }
                     syncDataMap(res);
                 }
@@ -362,5 +378,97 @@ public class StravaLoginPageActivity extends AppCompatActivity implements
             }
         }).start();
     }
+
+    private void uploadFile(){
+        new Thread(new Runnable() {
+            public void run() {
+                if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
+                    FileSerializer serializer = null;
+
+                    File file = new File(Environment.getExternalStorageDirectory()+"/sample.tcx");
+                    Calendar calendar = Calendar.getInstance();
+                    TCXDate date = tcxDate(calendar.get(Calendar.DAY_OF_MONTH), FEBRUARY, calendar.get(Calendar.YEAR), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+
+                        try {
+                            serializer = new FileSerializer(file);
+                            trainingCenterDatabase()
+                                .withActivities(activities(
+                                        activity(RUNNING)
+                                                .withID(date)
+                                                .withCreator(
+                                                        device("BreathZpot Sensor")
+                                                                .withVersion(version().major(1).minor(0))
+                                                                .withUnitId(1)
+                                                                .withProductId(1+(int)System.currentTimeMillis())
+                                                )
+                                                .withNotes(notes("A sample session"))
+                                                .withLaps(
+                                                        aLap(date)
+                                                                .withTotalTime(3000)
+                                                                .withDistance(1200)
+                                                                .withCalories(100)
+                                                                .withIntensity(ACTIVE)
+                                                                .withTriggerMethod(MANUAL)
+                                                                .withTracks(
+                                                                        trackWith(
+                                                                                aTrackpoint()
+                                                                                        .onTime(date)
+                                                                                        .withPosition(position(-3.6714, 36.8936)),
+                                                                                aTrackpoint()
+                                                                                        .onTime(date)
+                                                                                        .withPosition(position(-3.6727, 36.8946)),
+                                                                                aTrackpoint()
+                                                                                        .onTime(date)
+                                                                                        .withPosition(position(-3.6733, 36.901))
+                                                                        )
+                                                                )
+                                                )
+                                ))
+                                .withAuthor(
+                                        application("BreathZpot")
+                                                .withBuild(aBuild()
+                                                        .withVersion(version().major(2).minor(3)))
+                                                .withLanguageID("en")
+                                                .withPartNumber("123-45678-90")
+                                ).build()
+                                .serialize(serializer);
+                            serializer.save();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Log.i(TAG, "error: " + e);
+                        }
+
+                        try{
+                            UploadStatus uploadStatus = getUploadAPI().uploadFile(file)
+                                    .withDataType(DataType.TCX)
+                                    .withActivityType(UploadActivityType.RUN)
+                                    .withName("A run around the city")
+                                    .withDescription("No description")
+                                    .isPrivate(false)
+                                    .hasTrainer(false)
+                                    .isCommute(false)
+                                    .withExternalID("test.tcx")
+                                    .execute();
+
+                            int uploadID = uploadStatus.getId();
+                            syncDataMap("Upload status: " + getUploadAPI().checkUploadStatus(uploadID).execute().getStatus());
+                            Log.i(TAG, "Upload status: " + uploadStatus.getStatus());
+                            Log.i(TAG, "Status: " + getUploadAPI().checkUploadStatus(uploadStatus.getId()).execute().getStatus());
+                            Thread.sleep(2000);
+                            syncDataMap("Upload status: " + getUploadAPI().checkUploadStatus(uploadID).execute().getStatus());
+                        } catch(StravaAPIException ex){
+                            Log.i(TAG, "Exception:" + ex);
+                            syncDataMap("Failed to upload file");
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                } else {
+                    syncDataMap("External storage not accessible");
+                }
+            }
+        }).start();
+    }
+
 }
 

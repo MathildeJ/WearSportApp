@@ -1,60 +1,46 @@
 package com.example.mathilde.wearsportapp;
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.wearable.activity.ConfirmationActivity;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.DefaultOffsettingHelper;
 import android.support.wearable.view.WearableRecyclerView;
 import android.support.wearable.view.drawer.WearableActionDrawer;
 import android.support.wearable.view.drawer.WearableDrawerLayout;
-import android.support.wearable.view.drawer.WearableNavigationDrawer;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.fitness.ConfigApi;
-import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.Wearable;
-
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends WearableActivity implements
-        WearableActionDrawer.OnMenuItemClickListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+        WearableActionDrawer.OnMenuItemClickListener{
 
     private WearableDrawerLayout mWearableDrawerLayout;
     private WearableActionDrawer mWearableActionDrawer;
 
     private static final String STRAVA_LOGIN = "/strava_login";
-    private GoogleApiClient apiClient;
-    private Node node;
+    private static final String fragmentName = "apiClient";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        WearableRecyclerView menu_list = (WearableRecyclerView) findViewById(R.id.menu_list);
-        menu_list.setCenterEdgeItems(true);
-        menu_list.setOffsettingHelper(new DefaultOffsettingHelper());
 
-        com.example.mathilde.wearsportapp.MenuAdapter ma = new com.example.mathilde.wearsportapp.MenuAdapter();
-        ma.setContext(getApplicationContext());
-        menu_list.setAdapter(ma);
+        configureMenu();
+        configureDrawer();
+        initializeFragment();
+    }
 
+    private void initializeFragment(){
+        FragmentManager fragmentManager = getFragmentManager();
+        android.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        GoogleApiClientWithNodeFragment fragment = GoogleApiClientWithNodeFragment.newInstance(true, false, true,"");
+        fragmentTransaction.add(fragment, fragmentName);
+        fragmentTransaction.commit();
+    }
+
+    private void configureDrawer(){
         mWearableDrawerLayout = (WearableDrawerLayout) findViewById(R.id.drawer_layout);
         mWearableActionDrawer = (WearableActionDrawer) findViewById(R.id.bottom_action_drawer);
         mWearableActionDrawer.setOnMenuItemClickListener(this);
@@ -68,16 +54,16 @@ public class MainActivity extends WearableActivity implements
             }
         });
 
-        initializeClient();
     }
 
-    public void initializeClient(){
-        apiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addApi(Fitness.CONFIG_API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+    private void configureMenu(){
+        WearableRecyclerView menu_list = (WearableRecyclerView) findViewById(R.id.menu_list);
+        menu_list.setCenterEdgeItems(true);
+        menu_list.setOffsettingHelper(new DefaultOffsettingHelper());
+
+        com.example.mathilde.wearsportapp.MenuAdapter ma = new com.example.mathilde.wearsportapp.MenuAdapter();
+        ma.setContext(getApplicationContext());
+        menu_list.setAdapter(ma);
     }
 
     @Override
@@ -89,95 +75,11 @@ public class MainActivity extends WearableActivity implements
                 startActivity(SendNotificationActivity.createIntent(getApplicationContext(), "Send notifications"));
                 break;
             case R.id.menu_send_message:
-                sendStravaLoginMessage("");
+                GoogleApiClientWithNodeFragment fragment = (GoogleApiClientWithNodeFragment)getFragmentManager().findFragmentByTag(fragmentName);
+                fragment.sendMessage(STRAVA_LOGIN, "");
                 break;
         }
         mWearableDrawerLayout.closeDrawer(mWearableActionDrawer);
         return true;
     }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        resolveNode();
-    }
-
-    private void resolveNode() {
-        Wearable.NodeApi.getConnectedNodes(apiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-            @Override
-            public void onResult(@NonNull NodeApi.GetConnectedNodesResult nodesResult) {
-                for (Node node : nodesResult.getNodes()) {
-                    if (node.isNearby()) {
-                        MainActivity.this.node = node;
-                    }
-                }
-            }
-        });
-    }
-
-    private void sendStravaLoginMessage(String message){
-        if(node!=null & apiClient!=null && apiClient.isConnected()){
-            Wearable.MessageApi.sendMessage(
-                    apiClient, node.getId(), STRAVA_LOGIN, message.getBytes()).setResultCallback(
-                    new ResultCallback<MessageApi.SendMessageResult>() {
-                        @Override
-                        public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
-                            if(sendMessageResult.getStatus().isSuccess()){
-                                showConfirmation();
-                            } else {
-                                showError("Could not send Strava login request");
-                            }
-                        }
-                    }
-            );
-        } else if(node==null) {
-            showError("Could not find node");
-        } else {
-            showError("Could not connect to API");
-        }
-    }
-
-    private void showConfirmation(){
-        Intent intent = new Intent(this, ConfirmationActivity.class);
-        intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
-                ConfirmationActivity.OPEN_ON_PHONE_ANIMATION);
-        intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
-                "Open on phone");
-        startActivity(intent);
-    }
-
-    private void showError(String error){
-        Intent intent = new Intent(this, ConfirmationActivity.class);
-        intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
-                ConfirmationActivity.FAILURE_ANIMATION);
-        intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
-                error);
-        startActivity(intent);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(apiClient.isConnected()){
-          apiClient.disconnect();
-        }
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        if(apiClient == null || !apiClient.isConnected()){
-            apiClient.connect();
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
 }

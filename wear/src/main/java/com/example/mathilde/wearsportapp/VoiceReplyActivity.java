@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.RemoteInput;
-import android.support.v7.app.AppCompatActivity;
 import android.support.wearable.activity.WearableActivity;
 
 public class VoiceReplyActivity extends WearableActivity {

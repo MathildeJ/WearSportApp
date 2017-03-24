@@ -1,12 +1,8 @@
 package com.example.mathilde.wearsportapp;
 
-import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.wearable.activity.WearableActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
@@ -53,6 +49,9 @@ public class StravaAPIsActivity extends WearableActivity implements
     public void onCreateActivityClicked(){
         syncDataMap("LA");
     }
+
+    @OnClick(R.id.upload_file)
+    public void onUploadFileClicked(){ syncDataMap("UF"); }
 
     @Bind(R.id.text)
     TextView mTextView;
@@ -103,8 +102,6 @@ public class StravaAPIsActivity extends WearableActivity implements
 
     }
 
-
-
     private void syncDataMap(String string){
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/action");
         putDataMapReq.getDataMap().putString(TEXT, string);
@@ -120,6 +117,7 @@ public class StravaAPIsActivity extends WearableActivity implements
 
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
+        mTextView.setText("Fetching data...");
         final List<DataEvent> events = FreezableUtils.freezeIterable(dataEventBuffer);
         for(DataEvent event : events) {
             final Uri uri = event.getDataItem().getUri();

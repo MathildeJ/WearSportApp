@@ -1,6 +1,5 @@
 package com.example.mathilde.wearsportapp;
 
-import android.support.v7.widget.RecyclerView;
 import android.support.wearable.view.WearableRecyclerView;
 import android.view.View;
 import android.widget.ImageView;

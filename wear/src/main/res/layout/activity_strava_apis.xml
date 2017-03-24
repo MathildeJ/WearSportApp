@@ -1,35 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.example.mathilde.wearsportapp.StravaAPIsActivity">
+    tools:context="com.example.mathilde.wearsportapp.StravaAPIsActivity"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/text"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/retrieve_athlete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/strava_retrieve_athlete"/>
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="" />
 
-    <Button
-        android:id="@+id/list_activities"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/strava_list_activities"/>
+        <Button
+            android:id="@+id/retrieve_athlete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/strava_retrieve_athlete"/>
 
-    <Button
-        android:id="@+id/stats_athlete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/strava_stats_athlete"/>
+        <Button
+            android:id="@+id/list_activities"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/strava_list_activities"/>
 
-</LinearLayout>
+        <Button
+            android:id="@+id/stats_athlete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/strava_stats_athlete"/>
+
+        <Button
+            android:id="@+id/upload_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Upload a file"/>
+
+    </LinearLayout>
+</ScrollView>

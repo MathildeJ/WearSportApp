@@ -1,6 +1,5 @@
 package com.example.mathilde.wearsportapp;
 
-import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.wearable.view.WearableRecyclerView;
 import android.view.LayoutInflater;
@@ -18,12 +17,10 @@ import butterknife.ButterKnife;
 public class SportBrowserAdapter extends WearableRecyclerView.Adapter<SportBrowserAdapter.SportViewHolder> {
 
     List<Sport> sports;
-    //private Context context;
     private SportInterface sportInterface;
 
-    SportBrowserAdapter(List<Sport> sports, /*Context context,*/ SportInterface si){
+    SportBrowserAdapter(List<Sport> sports, SportInterface si){
         this.sports = sports;
-        //this.context = context;
         this.sportInterface = si;
     }
 
@@ -81,4 +78,3 @@ public class SportBrowserAdapter extends WearableRecyclerView.Adapter<SportBrows
 
     }
 }
-

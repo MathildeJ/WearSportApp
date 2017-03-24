@@ -62,21 +62,6 @@ public class SportBrowserActivity extends WearableActivity implements
         sports.add(new Sport("Running", "description", R.drawable.ic_run, "https://en.wikipedia.org/wiki/Running"));
         sports.add(new Sport("CrossFit", "description", R.drawable.ic_cross, "https://en.wikipedia.org/wiki/CrossFit"));
     }
-/*
-    @Override
-    protected void onStart() {
-        super.onStart();
-        apiClient.connect();
-    }
-*/
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(apiClient == null || !apiClient.isConnected()){
-          apiClient.connect();
-        }
-    }
 
     private void initializeClient(){
         apiClient = new GoogleApiClient.Builder(this)
@@ -109,6 +94,14 @@ public class SportBrowserActivity extends WearableActivity implements
                 }
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(apiClient == null || !apiClient.isConnected()){
+            apiClient.connect();
+        }
     }
 
     @Override

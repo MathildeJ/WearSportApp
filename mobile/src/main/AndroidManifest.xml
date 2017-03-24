@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -12,7 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +27,7 @@
             android:name="com.sweetzpot.stravazpot.authenticaton.ui.StravaLoginActivity"
             android:label="@string/login_strava" />
 
-        <service android:name=".OpenLinkService">
+        <service android:name=".MessagesWearableListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
 
@@ -32,50 +35,27 @@
                     android:host="*"
                     android:pathPrefix="/open_link"
                     android:scheme="wear" />
-            </intent-filter>
-        </service>
-
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
-        <service android:name=".StravaLoginService">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-
                 <data
                     android:host="*"
                     android:pathPrefix="/strava_login"
                     android:scheme="wear" />
-            </intent-filter>
-        </service>
-
-        <activity android:name=".StravaLoginPageActivity" />
-
-        <service android:name=".StravaRequestService">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-
+                <data
+                    android:host="*"
+                    android:pathPrefix="/start_session"
+                    android:scheme="wear" />
                 <data
                     android:host="*"
                     android:pathPrefix="/strava_request"
                     android:scheme="wear" />
             </intent-filter>
         </service>
-        <service android:name=".StartSessionService">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
 
-                <data
-                    android:host="*"
-                    android:pathPrefix="/start_session"
-                    android:scheme="wear" />
-            </intent-filter>
-        </service>
+        <activity android:name=".StravaLoginPageActivity" />
+        <activity android:name=".StartSessionActivity"></activity>
 
-        <activity android:name=".StartSessionActivity">
-
-        </activity>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

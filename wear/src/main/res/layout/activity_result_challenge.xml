@@ -20,12 +20,5 @@
             android:text="@string/result_message"
             android:textSize="18sp" />
 
-        <!--<Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/back" />-->
-
     </LinearLayout>
 </android.support.wearable.view.BoxInsetLayout>
